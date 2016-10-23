@@ -1,11 +1,3 @@
-//
-//  FilterTableViewController.swift
-//  Yelp
-//
-//  Created by R-J Lim on 10/21/16.
-//  Copyright © 2016 Timothy Lee. All rights reserved.
-//
-
 import UIKit
 
 protocol FilterViewControllerDelegate: class {
@@ -23,11 +15,9 @@ final class FilterViewController: UIViewController {
     var filters: Filters!
     
     fileprivate var categories: [Category] = []
-    fileprivate var sorts: [Sort] = Sort.values
     
     fileprivate var distanceTableViewController: DistanceTableViewController!
     fileprivate var sortTableViewController: SortTableViewController!
-    fileprivate var sortExpanded = false
     fileprivate var categoryExpanded = false
     fileprivate var categoriesSeeMoreIndex: Int!
     
@@ -168,6 +158,8 @@ extension FilterViewController: UITableViewDelegate {
         guard let section = Section(rawValue: indexPath.section) else {
             return
         }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
         
         switch section {
         case .distance:

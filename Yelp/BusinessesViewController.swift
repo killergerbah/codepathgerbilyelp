@@ -10,21 +10,30 @@ import UIKit
 
 class BusinessesViewController: UIViewController {
     
-    @IBOutlet weak var businessTableView: UITableView!
+    static let itemsPerPage = 20
     
+    @IBOutlet weak var businessTableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
+
     fileprivate var businesses: [Business]! = []
     fileprivate var filters = Filters()
     
-    @IBOutlet weak var searchBar: UISearchBar!
+    fileprivate var loadingMore = false
+    fileprivate var currentPageSize = BusinessesViewController.itemsPerPage
+    fileprivate var page = 0
     
+    fileprivate var canLoadMore: Bool {
+        return currentPageSize >= BusinessesViewController.itemsPerPage
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         businessTableView.dataSource = self
+        businessTableView.delegate = self
         businessTableView.rowHeight = UITableViewAutomaticDimension
         businessTableView.estimatedRowHeight = 120
-        
+
         searchBar.delegate = self
         
         navigationItem.titleView = searchBar
@@ -33,21 +42,39 @@ class BusinessesViewController: UIViewController {
     }
     
     fileprivate func search() {
+        search(for: 0)
+    }
+    
+    fileprivate func search(for page: Int) {
         guard let text = searchBar.text else {
             return
         }
-        search(for: text, sort: filters.sort, categories: filters.enabledCategories, deals: filters.deals, distance: filters.distance)
+        search(for: text, sort: filters.sort, categories: filters.enabledCategories, deals: filters.deals, distance: filters.distance, page: page)
     }
     
-    private func search(for term: String, sort: Sort, categories: [Category], deals: Bool, distance: Distance) {
+    private func search(for term: String, sort: Sort, categories: [Category], deals: Bool, distance: Distance, page: Int) {
         let categoryAliases: [String]? = categories.count == 0 ? nil : categories
             .map({ (c: Category) -> String in c.alias })
         
         let radius: Int? = distance == Distance.automatic ? nil : Int(distance.meters)
         
-        Business.searchWithTerm(term: term, sort: sort, categories: categoryAliases, deals: deals, radius: radius, completion: { (businesses: [Business]?, error: Error?) -> Void in
+        let itemsPerPage = BusinessesViewController.itemsPerPage
+        if page > 0 && !canLoadMore {
+            return
+        }
+        
+        Business.searchWithTerm(term: term, sort: sort, categories: categoryAliases, deals: deals, radius: radius, limit: itemsPerPage, offset: itemsPerPage * page, completion: { (businesses: [Business]?, error: Error?) -> Void in
             
-            self.businesses = businesses ?? []
+            if page > self.page {
+                self.businesses.append(contentsOf: businesses ?? [])
+                self.loadingMore = false
+            } else {
+                self.businesses = businesses ?? []
+            }
+            
+            self.loadingMore = false
+            self.page = page
+            self.currentPageSize = businesses == nil ? self.currentPageSize : businesses!.count
             self.businessTableView.reloadData()
         })
     }
@@ -80,16 +107,40 @@ extension BusinessesViewController: UISearchBarDelegate {
 extension BusinessesViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return businesses.count
+        return canLoadMore ? businesses.count + 1 : businesses.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "BusinessCell") as? BusinessTableViewCell else {
-            return BusinessTableViewCell()
+        if canLoadMore && indexPath.row == businesses.count,
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadingCell") as? LoadingTableViewCell {
+            cell.animate()
+            return cell
         }
         
-        cell.refresh(business: businesses[indexPath.row], index: indexPath.row)
-        return cell
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "BusinessCell") as? BusinessTableViewCell {
+            cell.refresh(business: businesses[indexPath.row], index: indexPath.row)
+            return cell
+        }
+        
+        return UITableViewCell()
+    }
+}
+
+extension BusinessesViewController: UITableViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Adapted from the infinite scroll Codepath guide
+        if (!loadingMore) {
+            // Calculate the position of one screen length before the bottom of the results
+            let scrollViewContentHeight = businessTableView.contentSize.height
+            let scrollOffsetThreshold = max(scrollViewContentHeight - businessTableView.bounds.size.height * 2 , 0)
+            
+            // When the user has scrolled past the threshold, start requesting
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && businessTableView.isDragging) {
+                loadingMore = true
+                search(for: page + 1)
+            }
+        }
     }
 }
 

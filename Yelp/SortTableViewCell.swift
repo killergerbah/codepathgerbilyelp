@@ -1,10 +1,10 @@
 import UIKit
 
 final class SortTableViewCell: UITableViewCell, ExpandableTableViewCell {
-
-    @IBOutlet weak var sortLabel: UILabel!
-    @IBOutlet weak var sortLabelChoice: UILabel!
     
+    @IBOutlet weak var checkLabel: UILabel!
+    @IBOutlet weak var sortLabel: UILabel!
+    @IBOutlet weak var arrowLabel: UILabel!
     private(set) var sort: Sort!
     var setting: Sort {
         return sort
@@ -14,6 +14,7 @@ final class SortTableViewCell: UITableViewCell, ExpandableTableViewCell {
     func refresh(with sort: Sort, expanded: Bool, selected: Bool) {
         self.sort = sort
         sortLabel.text = "\(sort.description)"
-        sortLabelChoice.isHidden = true
+        arrowLabel.isHidden = expanded
+        checkLabel.isHidden = !expanded || !selected
     }
 }
