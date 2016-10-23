@@ -10,10 +10,14 @@ import UIKit
 
 class BusinessesViewController: UIViewController {
     
-    fileprivate var businesses: [Business]! = []
-
     @IBOutlet weak var businessTableView: UITableView!
-
+    
+    fileprivate var businesses: [Business]! = []
+    fileprivate var filters = Filters()
+    
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,42 +25,59 @@ class BusinessesViewController: UIViewController {
         businessTableView.rowHeight = UITableViewAutomaticDimension
         businessTableView.estimatedRowHeight = 120
         
-        navigationItem.titleView = UISearchBar()
+        searchBar.delegate = self
         
+        navigationItem.titleView = searchBar
         
-        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
+        search()
+    }
+    
+    fileprivate func search() {
+        guard let text = searchBar.text else {
+            return
+        }
+        search(for: text, sort: filters.sort, categories: filters.enabledCategories, deals: filters.deals, distance: filters.distance)
+    }
+    
+    private func search(for term: String, sort: Sort, categories: [Category], deals: Bool, distance: Distance) {
+        let categoryAliases: [String]? = categories.count == 0 ? nil : categories
+            .map({ (c: Category) -> String in c.alias })
+        
+        let radius: Int? = distance == Distance.automatic ? nil : Int(distance.meters)
+        
+        Business.searchWithTerm(term: term, sort: sort, categories: categoryAliases, deals: deals, radius: radius, completion: { (businesses: [Business]?, error: Error?) -> Void in
             
-            self.businesses = businesses
-            if let businesses = businesses {
-                for business in businesses {
-                    print(business.name!)
-                    print(business.address!)
-                }
-            }
-            
+            self.businesses = businesses ?? []
             self.businessTableView.reloadData()
         })
-        
-        
-        /* Example of Yelp search with more search options specified
-         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-         self.businesses = businesses
-         
-         for business in businesses {
-         print(business.name!)
-         print(business.address!)
-         }
-         }
-         */
-        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let nc = segue.destination as? UINavigationController,
+            let vc = nc.topViewController as? FilterViewController else {
+                return
+        }
         
+        vc.delegate = self
+        vc.filters = filters
+    }
+    
+    @IBAction func onTap(_ sender: AnyObject) {
+        searchBar.resignFirstResponder()
     }
 }
 
-extension BusinessesViewController : UITableViewDataSource {
+extension BusinessesViewController: UISearchBarDelegate {
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        search()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        search()
+    }
+}
+
+extension BusinessesViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return businesses.count
@@ -70,4 +91,13 @@ extension BusinessesViewController : UITableViewDataSource {
         cell.refresh(business: businesses[indexPath.row], index: indexPath.row)
         return cell
     }
+}
+
+extension BusinessesViewController: FilterViewControllerDelegate {
+    
+    func filtersViewController(_ filtersViewController: FilterViewController, didUpdateFilters filters: Filters) {
+        self.filters = filters
+        search()
+    }
+    
 }

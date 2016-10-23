@@ -31,12 +31,9 @@ final class BusinessTableViewCell: UITableViewCell {
         super.awakeFromNib()
         businessImageView.layer.cornerRadius = 3
         businessImageView.clipsToBounds = true
-        
-    //    nameLabel.preferredMaxLayoutWidth = nameLabel.frame.size.width
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-    //    nameLabel.preferredMaxLayoutWidth = nameLabel.frame.size.width
     }
 }
