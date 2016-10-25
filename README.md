@@ -2,7 +2,7 @@
 
 **GerbilYelp** is a Yelp search app using the [Yelp API](http://www.yelp.com/developers/documentation/v2/search_api).
 
-Time spent: **15** hours spent in total
+Time spent: **17** hours spent in total
 
 ## User Stories
 
@@ -23,6 +23,7 @@ The following **optional** features are implemented:
 
 - [ ] Search results page
    - [ ] Infinite scroll for restaurant results.
+   - [ ] Implement map view of restaurant results.
 - [ ] Filter page
    - [ ] Distance filter should expand as in the real Yelp app
    - [ ] Categories should show a subset of the full list with a "See All" row to expand. Category list is [here](http://www.yelp.com/developers/documentation/category_list).
@@ -40,7 +41,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/mgqn2Fv.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/nxHYArS.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
