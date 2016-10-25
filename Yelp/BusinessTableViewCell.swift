@@ -32,8 +32,4 @@ final class BusinessTableViewCell: UITableViewCell {
         businessImageView.layer.cornerRadius = 3
         businessImageView.clipsToBounds = true
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
 }

@@ -10,7 +10,7 @@
         <!--Businesses View Controller-->
         <scene sceneID="5L9-Uz-lNK">
             <objects>
-                <viewController id="2xI-yr-O5N" customClass="BusinessesViewController" customModule="Yelp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="2xI-yr-O5N" customClass="BusinessesViewController" customModule="GerbilYelp" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hR0-74-jRp"/>
                         <viewControllerLayoutGuide type="bottom" id="VBY-gq-v8E"/>
@@ -22,7 +22,7 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="102" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="dj8-uN-sg5" userLabel="Business Table View">
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LoadingCell" id="pmA-lJ-u8a" userLabel="ActivityCell" customClass="LoadingTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LoadingCell" id="pmA-lJ-u8a" userLabel="ActivityCell" customClass="LoadingTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="92" width="375" height="102"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pmA-lJ-u8a" id="ZEF-X3-Y3C">
@@ -39,7 +39,7 @@
                                             <outlet property="activityIndicator" destination="1zb-dM-uFf" id="Oh7-IJ-oUy"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="BusinessCell" rowHeight="102" id="nms-7V-UGt" userLabel="Business Table View Cell" customClass="BusinessTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="BusinessCell" rowHeight="102" id="nms-7V-UGt" userLabel="Business Table View Cell" customClass="BusinessTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="194" width="375" height="102"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nms-7V-UGt" id="acw-h3-IQ8">
@@ -117,6 +117,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="SXU-nF-5cX"/>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <gestureRecognizers/>
@@ -125,6 +126,10 @@
                             <constraint firstItem="dj8-uN-sg5" firstAttribute="top" secondItem="XhR-oz-92f" secondAttribute="top" id="Bsh-mC-M8Y"/>
                             <constraint firstItem="dj8-uN-sg5" firstAttribute="leading" secondItem="XhR-oz-92f" secondAttribute="leading" id="DrT-PO-lsR"/>
                             <constraint firstItem="VBY-gq-v8E" firstAttribute="top" secondItem="dj8-uN-sg5" secondAttribute="bottom" id="WDJ-1f-7Bf"/>
+                            <constraint firstItem="VBY-gq-v8E" firstAttribute="top" secondItem="SXU-nF-5cX" secondAttribute="bottom" id="eE6-yc-hZ2"/>
+                            <constraint firstAttribute="trailing" secondItem="SXU-nF-5cX" secondAttribute="trailing" id="qfa-wx-BZP"/>
+                            <constraint firstItem="SXU-nF-5cX" firstAttribute="leading" secondItem="XhR-oz-92f" secondAttribute="leading" id="tpv-Y7-8vq"/>
+                            <constraint firstItem="SXU-nF-5cX" firstAttribute="top" secondItem="hR0-74-jRp" secondAttribute="bottom" id="yd8-7c-Srs"/>
                         </constraints>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="884-yv-JhA" appends="YES" id="Q6L-pr-jxm"/>
@@ -159,11 +164,13 @@
                     </navigationItem>
                     <connections>
                         <outlet property="businessTableView" destination="dj8-uN-sg5" id="6oe-nV-hcG"/>
+                        <outlet property="mapView" destination="SXU-nF-5cX" id="fLl-fa-1qa"/>
                         <outlet property="searchBar" destination="PX1-5T-c3s" id="3v4-Lh-Szb"/>
+                        <outlet property="tapGestureRecognizer" destination="884-yv-JhA" id="PMn-ae-joK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fgb-4b-F1b" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="884-yv-JhA">
+                <tapGestureRecognizer enabled="NO" id="884-yv-JhA">
                     <connections>
                         <action selector="onTap:" destination="2xI-yr-O5N" id="f0b-aK-sHx"/>
                     </connections>
@@ -174,7 +181,7 @@
         <!--Filters View Controller Scene-->
         <scene sceneID="CxA-Mf-fXa">
             <objects>
-                <viewController title="Filters View Controller Scene" id="zxv-vO-57P" customClass="FilterViewController" customModule="Yelp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Filters View Controller Scene" id="zxv-vO-57P" customClass="FilterViewController" customModule="GerbilYelp" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="msS-nX-TK9"/>
                         <viewControllerLayoutGuide type="bottom" id="TXu-Hi-vGU"/>
@@ -186,7 +193,7 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="vE0-UE-dJp">
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SortCell" id="4SW-AO-xdW" userLabel="SortCell" customClass="SortTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SortCell" id="4SW-AO-xdW" userLabel="SortCell" customClass="SortTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="92" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" tableViewCell="4SW-AO-xdW" id="zth-uo-IzM">
@@ -224,11 +231,11 @@
                                             <outlet property="sortLabel" destination="0vE-LU-ym3" id="xUg-BH-CaU"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DistanceCell" id="oqY-wK-FrT" userLabel="DistanceCell" customClass="DistanceTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DistanceCell" id="oqY-wK-FrT" userLabel="DistanceCell" customClass="DistanceTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="136" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="oqY-wK-FrT" id="CeQ-k1-0OX">
-                                            <frame key="frameInset" width="375" height="43.5"/>
+                                            <frame key="frameInset" width="375" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SOs-vo-t6Y" customClass="Distortions">
@@ -262,11 +269,11 @@
                                             <outlet property="distanceLabel" destination="SOs-vo-t6Y" id="MKf-Qp-xE8"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DealSwitchCell" id="Wpp-Lg-aOQ" userLabel="DealSwitchCell" customClass="DealSwitchTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="DealSwitchCell" id="Wpp-Lg-aOQ" userLabel="DealSwitchCell" customClass="DealSwitchTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="180" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Wpp-Lg-aOQ" id="U99-Dd-65f">
-                                            <frame key="frameInset" width="375" height="43.5"/>
+                                            <frame key="frameInset" width="375" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vy7-MK-JGE" userLabel="Setting Switch">
@@ -292,11 +299,11 @@
                                             <outlet property="settingSwitch" destination="Vy7-MK-JGE" id="IRK-gx-Vo5"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="FilterSwitchCell" id="bw4-ek-Nfk" userLabel="FilterSwitchCell" customClass="FilterSwitchTableViewCell" customModule="Yelp" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="FilterSwitchCell" id="bw4-ek-Nfk" userLabel="FilterSwitchCell" customClass="FilterSwitchTableViewCell" customModule="GerbilYelp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="224" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bw4-ek-Nfk" id="dXb-rK-zto">
-                                            <frame key="frameInset" width="375" height="43.5"/>
+                                            <frame key="frameInset" width="375" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ggggg" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EjS-HL-6RE">
@@ -326,7 +333,7 @@
                                         <rect key="frame" x="0.0" y="268" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kyi-Mg-q2W" id="5uE-uK-sPX">
-                                            <frame key="frameInset" width="375" height="43.5"/>
+                                            <frame key="frameInset" width="375" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aOM-0H-fe6">

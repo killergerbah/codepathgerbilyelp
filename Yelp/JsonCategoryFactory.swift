@@ -5,20 +5,21 @@ final class JsonCategoryFactory: CategoryFactory {
     
     static let instance = JsonCategoryFactory()
     
-    private var categories: [Category] = []
+    private var categories: [Category]? = nil
     
     private init() {
     }
     
     func get(category: String) -> [Category] {
-        if categories.count == 0 {
+        if categories == nil {
             readCategories()
         }
         
-        return categories.filter({ (c: Category) -> Bool in c.parents.contains(category) })
+        return categories!.filter({ (c: Category) -> Bool in c.parents.contains(category) })
     }
     
     private func readCategories() {
+        categories = []
         if let path = Bundle.main.path(forResource: "Categories", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: path))
@@ -28,7 +29,7 @@ final class JsonCategoryFactory: CategoryFactory {
                                 let title = category["title"] as? String,
                                 let alias = category["alias"] as? String,
                                 let parents = parents(from: category["parents"]) {
-                                self.categories.append(Category(parents: parents, title: title, alias: alias))
+                                self.categories?.append(Category(parents: parents, title: title, alias: alias))
                             }
                         }
                     }

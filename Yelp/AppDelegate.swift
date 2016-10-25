@@ -15,7 +15,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let vc1 = storyboard.instantiateInitialViewController()!
+        let vc2 = storyboard.instantiateInitialViewController()!
+        vc1.tabBarItem.title = "List"
+        vc1.tabBarItem.image = UIImage(named: "List")
+        
+        vc2.tabBarItem.title = "Map"
+        vc2.tabBarItem.image = UIImage(named: "Map")
+        
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [vc1, vc2]
+        
+        window?.rootViewController = tabBarController
+        window?.makeKeyAndVisible()
         return true
     }
 

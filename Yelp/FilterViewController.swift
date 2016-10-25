@@ -8,6 +8,7 @@ protocol FilterViewControllerDelegate: class {
 final class FilterViewController: UIViewController {
 
     private static let minShownCategories = 3
+    
     @IBOutlet weak var filterTableView: UITableView!
     
     weak var delegate: FilterViewControllerDelegate?

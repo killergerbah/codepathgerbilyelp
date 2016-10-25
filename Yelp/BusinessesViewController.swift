@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 class BusinessesViewController: UIViewController {
     
@@ -14,16 +15,34 @@ class BusinessesViewController: UIViewController {
     
     @IBOutlet weak var businessTableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
 
     fileprivate var businesses: [Business]! = []
     fileprivate var filters = Filters()
-    
     fileprivate var loadingMore = false
     fileprivate var currentPageSize = BusinessesViewController.itemsPerPage
     fileprivate var page = 0
-    
     fileprivate var canLoadMore: Bool {
         return currentPageSize >= BusinessesViewController.itemsPerPage
+    }
+    fileprivate var selected: Business?
+    fileprivate var display = Display.list
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.tabBarController?.delegate = self
+        updateView()
+    }
+    
+    private func updateView() {
+        switch display {
+        case .list:
+            businessTableView.reloadData()
+        case .map:
+            updateMap()
+        }
     }
     
     override func viewDidLoad() {
@@ -38,7 +57,17 @@ class BusinessesViewController: UIViewController {
         
         navigationItem.titleView = searchBar
         
-        search()
+        switch display {
+        case .list:
+            mapView.isHidden = true
+        case .map:
+            mapView.isHidden = false
+            mapView.setRegion(MKCoordinateRegionMake(CLLocation(latitude: 37.785771, longitude: -122.406165).coordinate, MKCoordinateSpanMake(0.1, 0.1)), animated: false)
+        }
+        
+        if businesses.count == 0 {
+            search()
+        }
     }
     
     fileprivate func search() {
@@ -75,8 +104,36 @@ class BusinessesViewController: UIViewController {
             self.loadingMore = false
             self.page = page
             self.currentPageSize = businesses == nil ? self.currentPageSize : businesses!.count
-            self.businessTableView.reloadData()
+            self.selected = nil
+            
+            self.updateView()
         })
+    }
+    
+    private func updateMap() {
+        mapView.removeAnnotations(mapView.annotations)
+
+        var annotations: [MKAnnotation] = []
+        var selectedAnnotation: MKAnnotation?
+        for business in businesses {
+            if let latitude = business.latitude,
+                let longitude = business.longitude {
+                let annotation = MKPointAnnotation()
+                annotation.title = business.name
+                annotation.subtitle = business.categories
+                annotation.coordinate = CLLocation(latitude: latitude, longitude: longitude).coordinate
+                annotations.append(annotation)
+                
+                if business == self.selected {
+                    selectedAnnotation = annotation
+                }
+            }
+        }
+        
+        if annotations.count > 0 {
+            mapView.addAnnotations(annotations)
+            mapView.selectAnnotation(selectedAnnotation ?? annotations[0], animated: true)
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -92,15 +149,25 @@ class BusinessesViewController: UIViewController {
     @IBAction func onTap(_ sender: AnyObject) {
         searchBar.resignFirstResponder()
     }
+    
+    fileprivate enum Display: Int {
+        case list = 0
+        case map
+    }
 }
 
 extension BusinessesViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        tapGestureRecognizer.isEnabled = false
         search()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         search()
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        tapGestureRecognizer.isEnabled = true
     }
 }
 
@@ -128,6 +195,19 @@ extension BusinessesViewController: UITableViewDataSource {
 
 extension BusinessesViewController: UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        selected = businesses[indexPath.row]
+        
+        if let tabBarController = navigationController?.tabBarController,
+            let tabBarViewControllers = tabBarController.viewControllers,
+            tabBarViewControllers.count >= Display.map.rawValue + 1 {
+            let mapViewController = tabBarViewControllers[Display.map.rawValue]
+            tabBarController.selectedViewController = mapViewController
+            tabBarController.delegate?.tabBarController?(tabBarController, didSelect: mapViewController)
+        }
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // Adapted from the infinite scroll Codepath guide
         if (!loadingMore) {
@@ -151,4 +231,22 @@ extension BusinessesViewController: FilterViewControllerDelegate {
         search()
     }
     
+}
+
+extension BusinessesViewController: UITabBarControllerDelegate {
+    
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        guard let navigationController = viewController as? UINavigationController,
+            let viewController = navigationController.visibleViewController as? BusinessesViewController else {
+            return
+        }
+        if let index = tabBarController.viewControllers?.index(of: navigationController),
+            let display = Display(rawValue: index) {
+            viewController.display = display
+            viewController.businesses = businesses
+            viewController.searchBar.text = searchBar.text
+            viewController.filters = filters
+            viewController.selected = selected
+        }
+    }
 }
